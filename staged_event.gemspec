@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = "https://github.com/Freshly/staged_event"
   spec.license     = "MIT"
 
-  spec.add_dependency "activerecord", ">= 6.0.0"
+  spec.add_runtime_dependency "activerecord", ">= 6.0.0"
+  spec.add_runtime_dependency "google-protobuf", ">= 3.8.0", "< 4.0.0"
 end
 
