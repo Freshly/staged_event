@@ -14,8 +14,9 @@ module StagedEvent
       }
     )
 
-    serialized_proto = MessageEnvelope.encode(envelope)
+    data = MessageEnvelope.encode(envelope)
+    topic = kwargs.fetch(:topic, nil)
 
-    Model.new(data: serialized_proto, topic: kwargs.fetch(:topic, nil))
+    Model.new(data: data, topic: topic)
   end
 end
