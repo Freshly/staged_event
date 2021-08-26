@@ -6,4 +6,14 @@ This gem is relevant for any process that wants to publish events to a set of su
 
 Staging events this way allows them to be persisted within the same database transaction as associated domain-specific records, guaranteeing at-least-once delivery and eventual consistency.
 
-The implementation supports Google Pub/Sub as the publishing infrastructure, and assumes a Postgres database (>= version 9.5) accessed via ActiveRecord.
+For now, StagedEvent makes the following assumptions:
+- Events are defined as protobufs (and you have generated Ruby classes for them)
+- [Google Pub/Sub](https://cloud.google.com/pubsub/) is the underyling messaging infrastructure
+- You're using a Postgres database (>= version 9.5) via ActiveRecord.
+
+
+### Regenerating Ruby from protobufs
+
+StagedEvent uses a one-off protobuf definition to serialize and deserialize events that are defined as protobufs. In case it becomes necessary to recreate the auto-generated ruby, the command for that (from the repository root) is:
+
+protoc --ruby_out=./ "./lib/staged_event/message_envelope.proto"
