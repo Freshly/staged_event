@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.license     = "MIT"
 
   spec.add_runtime_dependency "activerecord", ">= 6.0.0"
+  spec.add_runtime_dependency "directive", ">= 0.23.1.1"
   spec.add_runtime_dependency "google-protobuf", ">= 3.8.0", "< 4.0.0"
 
   spec.add_development_dependency "rspec"
