@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activerecord", ">= 6.0.0"
   spec.add_runtime_dependency "directive", ">= 0.23.1.1"
   spec.add_runtime_dependency "google-protobuf", ">= 3.8.0", "< 4.0.0"
+  spec.add_runtime_dependency "google-cloud-pubsub"
 
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "database_cleaner"
