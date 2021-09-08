@@ -1,29 +1,49 @@
 # frozen_string_literal: true
 
 RSpec.describe StagedEvent::Publisher::GooglePubSub do
+  let(:instance) { described_class.new }
+  let(:event) do
+    StagedEvent::Model.new(
+      topic: event_topic,
+      data: Faker::Alphanumeric.alphanumeric,
+    )
+  end
+  let(:event_topic) { default_topic }
+  let(:default_topic) { Faker::Lorem.word }
+  let(:alternate_topic) { Faker::Lorem.word }
+  let(:topic_map) do
+    {
+      default_topic => Faker::Lorem.word,
+      alternate_topic => Faker::Lorem.word,
+    }
+  end
+  let(:google_pubsub_config) do
+    OpenStruct.new(
+      topic_map: topic_map,
+      project_id: Faker::Alphanumeric.alphanumeric,
+      credentials: Faker::Alphanumeric.alphanumeric,
+    )
+  end
+
+  describe "#initialize" do
+    subject { -> { instance } }
+
+    context "when the topic map is not a hash" do
+      let(:topic_map) { nil }
+
+      it { is_expected.to raise_error(ArgumentError) }
+    end
+
+    context "when the topic map is empty" do
+      let(:topic_map) { {} }
+
+      it { is_expected.to raise_error(ArgumentError) }
+    end
+  end
+
   describe "#publish" do
     subject(:publish) { instance.publish(event) }
 
-    let(:instance) { described_class.new }
-    let(:event) do
-      StagedEvent::Model.new(
-        topic: event_topic,
-        data: Faker::Alphanumeric.alphanumeric,
-      )
-    end
-    let(:event_topic) { default_topic }
-    let(:default_topic) { Faker::Lorem.word }
-    let(:alternate_topic) { Faker::Lorem.word }
-    let(:google_pubsub_config) do
-      OpenStruct.new(
-        topic_map: Hash[
-          default_topic, Faker::Lorem.word,
-          alternate_topic, Faker::Lorem.word,
-        ],
-        project_id: Faker::Alphanumeric.alphanumeric,
-        credentials: Faker::Alphanumeric.alphanumeric,
-      )
-    end
     let(:google_pubsub_project) { instance_double(Google::Cloud::PubSub::Project) }
     let(:google_pubsub_topic) { instance_double(Google::Cloud::PubSub::Topic) }
     let(:expected_topic_id) { google_pubsub_config.topic_map[default_topic] }
@@ -68,6 +88,14 @@ RSpec.describe StagedEvent::Publisher::GooglePubSub do
       let(:expected_topic_id) { google_pubsub_config.topic_map[alternate_topic] }
 
       it_behaves_like "it selects the topic"
+    end
+
+    context "when the event specifies a topic not found in the topic_map" do
+      let(:event_topic) { Faker::Alphanumeric.alphanumeric }
+
+      it "raises a KeyError" do
+        expect { publish }.to raise_error(KeyError)
+      end
     end
   end
 end
