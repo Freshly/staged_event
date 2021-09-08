@@ -81,7 +81,7 @@ RSpec.describe StagedEvent::PublisherProcess do
           publish_count = 0
           allow(publisher).to receive(:publish) do
             publish_count += 1
-            raise StagedEvent::Publisher::PublishFailedError if publish_count == 1
+            raise StandardError, "publishing failed" if publish_count == 1
           end
           run
         end
