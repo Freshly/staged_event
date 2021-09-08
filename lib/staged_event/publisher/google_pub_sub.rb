@@ -5,8 +5,6 @@ require "google/cloud/pubsub"
 module StagedEvent
   module Publisher
     class GooglePubSub < Base
-      include ShortCircuIt
-
       def publish(model)
         topic_id = topic_map.fetch(model.topic, topic_map.values.first)
         google_topic = google_pubsub.topic(topic_id, skip_lookup: true)
@@ -18,12 +16,11 @@ module StagedEvent
       private
 
       def google_pubsub
-        Google::Cloud::PubSub.new(
+        @google_pubsub ||= Google::Cloud::PubSub.new(
           project_id: Configuration.config.google_pubsub.project_id,
           credentials: Configuration.config.google_pubsub.credentials,
         )
       end
-      memoize :google_pubsub
 
       def topic_map
         Configuration.config.google_pubsub.topic_map
