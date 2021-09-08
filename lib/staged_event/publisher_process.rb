@@ -6,7 +6,7 @@ module StagedEvent
 
     def initialize(publisher)
       @publisher = publisher
-      @backoff_timer = Publisher::BackoffTimer.new
+      @backoff_timer = BackoffTimer.new
     end
 
     def run

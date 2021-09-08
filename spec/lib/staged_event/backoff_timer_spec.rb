@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe StagedEvent::Publisher::BackoffTimer do
+RSpec.describe StagedEvent::BackoffTimer do
   subject(:value) { instance.value }
 
   let(:instance) { described_class.new }
@@ -18,7 +18,7 @@ RSpec.describe StagedEvent::Publisher::BackoffTimer do
     end
 
     before do
-      stub_const("StagedEvent::Publisher::BackoffTimer::INCREMENTS_BEFORE_BACKOFF", 2)
+      stub_const("StagedEvent::BackoffTimer::INCREMENTS_BEFORE_BACKOFF", 2)
     end
 
     it "returns the expected sequence" do
