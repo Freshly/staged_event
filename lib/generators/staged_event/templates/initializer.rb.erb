@@ -17,4 +17,10 @@ StagedEvent::Configuration.configure do |config|
       default: "breaking-news",
     }
   end
+
+  config.publisher do |publisher|
+    # The number of events that a publisher will transactionally publish and remove
+    # from the database in each iteration.
+    publisher.batch_size = 5
+  end
 end
