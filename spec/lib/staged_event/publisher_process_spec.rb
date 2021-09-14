@@ -8,7 +8,7 @@ RSpec.describe StagedEvent::PublisherProcess do
     let(:publisher) { instance_double(StagedEvent::Publisher::Base) }
     let(:backoff_timer) do
       instance_double(
-        StagedEvent::Publisher::BackoffTimer, {
+        StagedEvent::BackoffTimer, {
           reset: nil,
           increment: nil,
           value: backoff_timer_value,
@@ -20,7 +20,7 @@ RSpec.describe StagedEvent::PublisherProcess do
 
     before do
       allow(StagedEvent::Configuration).to receive_message_chain(:config, :publisher, :batch_size).and_return(batch_size)
-      allow(StagedEvent::Publisher::BackoffTimer).to receive(:new).and_return(backoff_timer)
+      allow(StagedEvent::BackoffTimer).to receive(:new).and_return(backoff_timer)
       allow(publisher).to receive(:publish)
       allow(instance).to receive(:loop).and_yield
       allow(instance).to receive(:sleep)
@@ -81,7 +81,7 @@ RSpec.describe StagedEvent::PublisherProcess do
           publish_count = 0
           allow(publisher).to receive(:publish) do
             publish_count += 1
-            raise StagedEvent::Publisher::PublishFailedError if publish_count == 1
+            raise StandardError, "publishing failed" if publish_count == 1
           end
           run
         end

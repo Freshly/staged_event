@@ -6,7 +6,7 @@ module StagedEvent
 
     def initialize(publisher)
       @publisher = publisher
-      @backoff_timer = Publisher::BackoffTimer.new
+      @backoff_timer = BackoffTimer.new
     end
 
     def run
@@ -14,8 +14,8 @@ module StagedEvent
         sleep(backoff_timer.value)
         publish_next_batch
       end
-    rescue Publisher::PublishFailedError => exception
-      error :publish_failed, exception: exception
+    rescue StandardError => exception
+      error :publish_failed, exception: exception.message
       backoff_timer.increment
       retry
     end
