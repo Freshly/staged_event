@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "directive"
+
 module StagedEvent
   module Configuration
     extend Directive
