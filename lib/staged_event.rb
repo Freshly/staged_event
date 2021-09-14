@@ -10,7 +10,7 @@ require_relative "staged_event/publisher/stdout"
 require_relative "staged_event/publisher_process"
 require_relative "staged_event/version"
 
-require_relative "staged_event/railtie" if defined?(Rails::Railtie)
+require_relative "staged_event/railtie" if defined?(Rails)
 
 module StagedEvent
   class << self
