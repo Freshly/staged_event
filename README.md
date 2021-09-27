@@ -46,4 +46,4 @@ rake staged_event:publisher
 
 StagedEvent uses a one-off protobuf definition to serialize and deserialize events that are defined as protobufs. In case it becomes necessary to recreate the auto-generated ruby, the command for that (from the repository root) is:
 
-protoc --ruby_out=./ "./lib/staged_event/message_envelope.proto"
+protoc --ruby_out=./ "./lib/staged_event/event_envelope.proto"
