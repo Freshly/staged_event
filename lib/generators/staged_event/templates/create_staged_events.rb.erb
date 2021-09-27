@@ -5,7 +5,7 @@ class CreateStagedEvents < ActiveRecord::Migration[6.0]
 
     create_table :staged_events, id: :uuid do |t|
       t.string :topic
-      t.binary :data
+      t.binary :data, null: false
       t.datetime :created_at, null: false
     end
   end
