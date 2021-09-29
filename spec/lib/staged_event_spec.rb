@@ -1,35 +1,82 @@
 # frozen_string_literal: true
 
 RSpec.describe StagedEvent do
-  describe ".from_proto" do
-    subject { described_class.from_proto(proto, **options) }
-
-    let(:proto) { double }
-    let(:options) { { topic: [ nil, Faker::Lorem.word ].sample } }
-    let(:proto_type_url) { Faker::Alphanumeric.alphanumeric }
-    let(:proto_value) { Faker::Alphanumeric.alphanumeric }
-    let(:envelope) { instance_double(described_class::EventEnvelope) }
-    let(:expected_uuid) { Faker::Alphanumeric.alphanumeric }
-    let(:expected_envelope_params) do
-      {
-        event: {
-          type_url: proto_type_url,
-          value: proto_value,
-        },
-        uuid: expected_uuid,
-      }
+  describe "protobuf support" do
+    Google::Protobuf::DescriptorPool.generated_pool.build do
+      add_file("example_event.proto", syntax: :proto3) do
+        add_message "staged_event.ExampleEvent" do
+          optional :foo, :string, 1
+          optional :bar, :string, 2
+        end
+      end
     end
-    let(:serialized_proto) { Faker::Alphanumeric.alphanumeric }
+
+    let(:example_proto) do
+      ExampleEvent.new(
+        foo: Faker::Alphanumeric.alphanumeric,
+        bar: Faker::Alphanumeric.alphanumeric,
+      )
+    end
 
     before do
-      allow(SecureRandom).to receive(:uuid).and_return(expected_uuid)
-      allow(proto).to receive_message_chain(:class, :descriptor, :name).and_return(proto_type_url)
-      allow(proto).to receive_message_chain(:class, :encode).with(proto).and_return(proto_value)
-      allow(described_class::EventEnvelope).to receive(:new).with(expected_envelope_params).and_return(envelope)
-      allow(described_class::EventEnvelope).to receive(:encode).with(envelope).and_return(serialized_proto)
+      stub_const("ExampleEvent", ::Google::Protobuf::DescriptorPool.generated_pool.lookup("staged_event.ExampleEvent").msgclass)
     end
 
-    it { is_expected.to be_instance_of(described_class::Model) }
-    it { is_expected.to have_attributes(id: expected_uuid, data: serialized_proto, topic: options[:topic]) }
+    describe ".from_proto" do
+      subject { described_class.from_proto(example_proto, **options) }
+
+      let(:options) { { topic: [ nil, Faker::Lorem.word ].sample } }
+      let(:expected_data) { described_class::EventEnvelope.encode(envelope) }
+      let(:envelope) do
+        described_class::EventEnvelope.new(
+          event: {
+            type_url: ExampleEvent.descriptor.name,
+            value: ExampleEvent.encode(example_proto),
+          },
+          uuid: expected_uuid,
+        )
+      end
+      let(:expected_uuid) { Faker::Alphanumeric.alphanumeric }
+
+      before do
+        allow(SecureRandom).to receive(:uuid).and_return(expected_uuid)
+      end
+
+      it { is_expected.to be_instance_of(described_class::Model) }
+      it { is_expected.to have_attributes(id: expected_uuid, data: expected_data, topic: options[:topic]) }
+    end
+
+    describe ".deserialize_event" do
+      subject(:call) { described_class.deserialize_event(serialized_data) }
+
+      let(:serialized_data) { model.data }
+      let(:model) { described_class.from_proto(example_proto) }
+      let(:expected_result) do
+        OpenStruct.new(
+          id: model.id,
+          data: example_proto,
+        )
+      end
+
+      it { is_expected.to eq(expected_result) }
+
+      context "when decoding the serialized data is invalid" do
+        let(:serialized_data) { Faker::Alphanumeric.alphanumeric }
+
+        it "raises a DeserializationError" do
+          expect { call }.to raise_error(described_class::DeserializationError)
+        end
+      end
+
+      context "when the protobuf type is not registered" do
+        before do
+          allow(Google::Protobuf::DescriptorPool).to receive_message_chain(:generated_pool, :lookup).and_return(nil)
+        end
+
+        it "raises an UnknownEventTypeError" do
+          expect { call }.to raise_error(described_class::UnknownEventTypeError)
+        end
+      end
+    end
   end
 end
