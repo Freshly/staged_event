@@ -35,7 +35,7 @@ module StagedEvent
         end
       end
 
-      # TODO: Google pub/sub API has built-in multi-threaded listeners but I haven't
+      # TODO: Google pub/sub has built-in multi-threaded listeners but I haven't
       # been able to successfully receive any messages using that API yet.
       #
       # def receive_events_from_subscription(subscription_id)
