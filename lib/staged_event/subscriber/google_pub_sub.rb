@@ -29,9 +29,7 @@ module StagedEvent
         loop do
           received_messages = subscription.pull(immediate: false)
           received_messages.each do |received_message|
-            data = received_message.data
-            info :message_received
-            # event_received_callback.call(message.data)
+            event_received_callback.call(received_message.data)
             received_message.acknowledge!
           end
         end
