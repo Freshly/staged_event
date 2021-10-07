@@ -8,6 +8,9 @@ require_relative "staged_event/publisher/base"
 require_relative "staged_event/publisher/google_pub_sub"
 require_relative "staged_event/publisher/stdout"
 require_relative "staged_event/publisher_process"
+require_relative "staged_event/subscriber/base"
+require_relative "staged_event/subscriber/google_pub_sub"
+require_relative "staged_event/subscriber_process"
 require_relative "staged_event/version"
 
 require_relative "staged_event/railtie" if defined?(Rails)
