@@ -14,13 +14,40 @@ StagedEvent::Configuration.configure do |config|
     # The first entry in the map is used as the default for when the event does
     # not specify a topic.
     google_pubsub.topic_map = {
-      default: "breaking-news",
+      default: "topic_id_1",
     }
+
+    google_pubsub.subscription_ids = [ "subscription_id_1" ]
   end
 
   config.publisher do |publisher|
     # The number of events that a publisher will transactionally publish and remove
     # from the database in each iteration.
     publisher.batch_size = 5
+  end
+
+  config.subscriber do |subscriber|
+    # This callback will be run for every message received, and is passed the serialized
+    # event data.
+    subscriber.event_received_callback = lambda do |serialized_data|
+      #
+      # To respond to the the event, one could either
+      # 1) enqueue a background job with serialized_data as a parameter
+      # 2) handle the event in-process. For example:
+      #
+      #   event = StagedEvent.deserialize_event(serialized_data)
+      #
+      #   event.id is globally-unique and can be used for idempotency.
+      #   event.data is the event deserialized into its original form (typically a
+      #   protobuf object).
+      #
+      #   if event.data.is_a?(MyEvents::SomethingHappened)
+      #     handle_something_happening
+      #   end
+      #
+      # WARNING: At the moment, the google pub/sub subscriber only has one thread
+      # per subscription id, so execution of this callback _blocks_ receipt of
+      # subsequent events for the subscription.
+    end
   end
 end
