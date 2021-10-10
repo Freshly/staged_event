@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe StagedEvent::Subscriber::GooglePubSub do
+RSpec.describe StagedEvent::GooglePubSub::Subscriber do
   let(:instance) { described_class.new }
   let(:topic) { Faker::Lorem.word }
   let(:subscriber_config) do
@@ -19,8 +19,10 @@ RSpec.describe StagedEvent::Subscriber::GooglePubSub do
       credentials: Faker::Alphanumeric.alphanumeric,
     )
   end
+  let(:google_pubsub_project) { instance_double(Google::Cloud::PubSub::Project) }
 
   before do
+    allow(StagedEvent::GooglePubSub::Helper).to receive(:new_google_pubsub).and_return(google_pubsub_project)
     allow(StagedEvent::Configuration).to receive_message_chain(:config, :subscriber).and_return(subscriber_config)
     allow(StagedEvent::Configuration).to receive_message_chain(:config, :google_pubsub).and_return(google_pubsub_config)
   end
@@ -63,7 +65,6 @@ RSpec.describe StagedEvent::Subscriber::GooglePubSub do
     subject(:call) { instance.receive_events_from_subscription(subscription_id) }
 
     let(:subscription_id) { subscription_ids.sample }
-    let(:google_pubsub_project) { instance_double(Google::Cloud::PubSub::Project) }
     let(:google_pubsub_subscription) { instance_double(Google::Cloud::PubSub::Subscription ) }
     let(:google_pubsub_received_messages) do
       Array.new(rand(1..3)) do

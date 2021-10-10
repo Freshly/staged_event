@@ -5,7 +5,7 @@ RSpec.describe StagedEvent::PublisherProcess do
     subject(:run) { instance.run }
 
     let(:instance) { described_class.new(publisher) }
-    let(:publisher) { instance_double(StagedEvent::Publisher::Base) }
+    let(:publisher) { instance_double(StagedEvent::Publisher) }
     let(:backoff_timer) do
       instance_double(
         StagedEvent::BackoffTimer, {

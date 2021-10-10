@@ -2,8 +2,6 @@
 
 StagedEvent::Configuration.configure do |config|
   config.google_pubsub do |google_pubsub|
-    # Identifier for a Pub/Sub project
-    google_pubsub.project_id = "your-project"
     # The contents of the Pub/Sub keyfile as a Hash
     google_pubsub.credentials = {}
 

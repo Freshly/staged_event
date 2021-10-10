@@ -8,7 +8,6 @@ module StagedEvent
 
     configuration_options do
       nested :google_pubsub do
-        option :project_id
         option :credentials
         option :topic_map
         option :subscription_ids

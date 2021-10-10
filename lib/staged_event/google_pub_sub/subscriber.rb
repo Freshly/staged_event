@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require "google/cloud/pubsub"
-
 module StagedEvent
-  module Subscriber
-    class GooglePubSub < Base
+  module GooglePubSub
+    class Subscriber < StagedEvent::Subscriber
       include Technologic
 
       def initialize
+        @google_pubsub = Helper.new_google_pubsub
+
         raise ArgumentError, "event_received_callback is undefined" unless event_received_callback.respond_to?(:call)
       end
 
       def receive_events
         threads = []
 
-        Configuration.config.google_pubsub.subscription_ids.each do |subscription_id|
+        subscription_ids.each do |subscription_id|
           threads << Thread.new do
             receive_events_from_subscription(subscription_id)
           end
@@ -54,15 +54,14 @@ module StagedEvent
 
       private
 
-      def event_received_callback
-        Configuration.config.subscriber.event_received_callback
+      attr_reader :google_pubsub
+
+      def subscription_ids
+        Configuration.config.google_pubsub.subscription_ids
       end
 
-      def google_pubsub
-        @google_pubsub ||= Google::Cloud::PubSub.new(
-          project_id: Configuration.config.google_pubsub.project_id,
-          credentials: Configuration.config.google_pubsub.credentials,
-        )
+      def event_received_callback
+        Configuration.config.subscriber.event_received_callback
       end
     end
   end

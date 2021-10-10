@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe StagedEvent::Publisher::GooglePubSub do
+RSpec.describe StagedEvent::GooglePubSub::Publisher do
   let(:instance) { described_class.new }
   let(:event) do
     StagedEvent::Model.new(
@@ -17,12 +17,10 @@ RSpec.describe StagedEvent::Publisher::GooglePubSub do
       alternate_topic => Faker::Lorem.word,
     }
   end
-  let(:google_pubsub_config) do
-    OpenStruct.new(
-      topic_map: topic_map,
-      project_id: Faker::Alphanumeric.alphanumeric,
-      credentials: Faker::Alphanumeric.alphanumeric,
-    )
+  let(:google_pubsub_project) { instance_double(Google::Cloud::PubSub::Project) }
+
+  before do
+    allow(StagedEvent::GooglePubSub::Helper).to receive(:new_google_pubsub).and_return(google_pubsub_project)
   end
 
   describe "#initialize" do
@@ -44,24 +42,15 @@ RSpec.describe StagedEvent::Publisher::GooglePubSub do
   describe "#publish" do
     subject(:publish) { instance.publish(event) }
 
-    let(:google_pubsub_project) { instance_double(Google::Cloud::PubSub::Project) }
     let(:google_pubsub_topic) { instance_double(Google::Cloud::PubSub::Topic) }
-    let(:expected_topic_id) { google_pubsub_config.topic_map[default_topic] }
+    let(:expected_topic_id) { topic_map[default_topic] }
 
     before do
-      allow(StagedEvent::Configuration).to receive_message_chain(:config, :google_pubsub).and_return(google_pubsub_config)
-      allow(Google::Cloud::PubSub).to receive(:new).and_return(google_pubsub_project)
+      allow(StagedEvent::Configuration).to receive_message_chain(:config, :google_pubsub, :topic_map).and_return(topic_map)
       allow(google_pubsub_project).to receive(:topic).and_return(google_pubsub_topic)
       allow(google_pubsub_topic).to receive(:publish)
     end
 
-    it "initializes the Google Pub/Sub project" do
-      publish
-      expect(Google::Cloud::PubSub).to have_received(:new).with(
-        project_id: google_pubsub_config.project_id,
-        credentials: google_pubsub_config.credentials,
-      )
-    end
 
     it "publishes the event" do
       publish
@@ -85,7 +74,7 @@ RSpec.describe StagedEvent::Publisher::GooglePubSub do
 
     context "when the event specifies an alternate topic" do
       let(:event_topic) { alternate_topic }
-      let(:expected_topic_id) { google_pubsub_config.topic_map[alternate_topic] }
+      let(:expected_topic_id) { topic_map[alternate_topic] }
 
       it_behaves_like "it selects the topic"
     end

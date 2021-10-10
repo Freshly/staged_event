@@ -5,7 +5,7 @@ RSpec.describe StagedEvent::SubscriberProcess do
     subject(:run) { instance.run }
 
     let(:instance) { described_class.new(subscriber) }
-    let(:subscriber) { instance_double(StagedEvent::Subscriber::Base, receive_events: nil) }
+    let(:subscriber) { instance_double(StagedEvent::Subscriber, receive_events: nil) }
 
     it "calls receive_events on the subscriber" do
       run
