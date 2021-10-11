@@ -29,10 +29,14 @@ module StagedEvent
         loop do
           received_messages = subscription.pull(immediate: false)
           received_messages.each do |received_message|
+            info :message_received, id: received_message.id
             event_received_callback.call(received_message.data)
             received_message.acknowledge!
           end
         end
+      rescue StandardError => exception
+        error :subscription_failed, exception: exception.message
+        retry
       end
 
       # TODO: Google pub/sub has built-in multi-threaded listeners but I haven't
