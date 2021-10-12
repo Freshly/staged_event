@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
+require "google/cloud/pubsub"
+
 require_relative "staged_event/backoff_timer"
 require_relative "staged_event/configuration"
 require_relative "staged_event/event_envelope_pb"
 require_relative "staged_event/model"
-require_relative "staged_event/publisher/base"
-require_relative "staged_event/publisher/google_pub_sub"
-require_relative "staged_event/publisher/stdout"
+require_relative "staged_event/publisher"
+require_relative "staged_event/subscriber"
 require_relative "staged_event/publisher_process"
+require_relative "staged_event/subscriber_process"
 require_relative "staged_event/version"
+
+require_relative "staged_event/google_pub_sub/helper"
+require_relative "staged_event/google_pub_sub/publisher"
+require_relative "staged_event/google_pub_sub/subscriber"
 
 require_relative "staged_event/railtie" if defined?(Rails)
 
