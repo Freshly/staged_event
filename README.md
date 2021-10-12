@@ -42,6 +42,16 @@ In order for events to actually be published, StagedEvent provides a rake task t
 rake staged_event:publisher
 ```
 
+### Receiving Events
+
+In order to receive events from publishers, StagedEvent provides a rake task that should be kept running alongside your application server(s):
+
+```bash
+rake staged_event:subscriber
+```
+
+In order to process incoming events, you define a callback in the staged_event initializer file.
+
 ### Regenerating Ruby from protobufs
 
 StagedEvent uses a one-off protobuf definition to serialize and deserialize events that are defined as protobufs. In case it becomes necessary to recreate the auto-generated ruby, the command for that (from the repository root) is:
