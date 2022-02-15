@@ -42,7 +42,7 @@ A typical usage of StagedEvent would look something like this:
 ActiveRecord::Base.transaction do
   user = User.create!(params)
 
-  StagedEvent.save_from_proto!(MyEvents::UserCreatedEvent.new(name: user.name, email: user.email))
+  StagedEvent.save_proto!(MyEvents::UserCreatedEvent.new(name: user.name, email: user.email))
 end
 ```
 This guarantees that a) creating a new User, and b) publishing the associated event, both happen atomically even though b) will result in sending data to an external system.
