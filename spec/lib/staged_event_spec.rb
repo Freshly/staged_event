@@ -17,6 +17,7 @@ RSpec.describe StagedEvent do
         bar: Faker::Alphanumeric.alphanumeric,
       )
     end
+    let(:options) { { topic: [ nil, Faker::Lorem.word ].sample } }
 
     before do
       stub_const("ExampleEvent", ::Google::Protobuf::DescriptorPool.generated_pool.lookup("staged_event.ExampleEvent").msgclass)
@@ -25,7 +26,6 @@ RSpec.describe StagedEvent do
     describe ".from_proto" do
       subject { described_class.from_proto(example_proto, **options) }
 
-      let(:options) { { topic: [ nil, Faker::Lorem.word ].sample } }
       let(:expected_data) { described_class::EventEnvelope.encode(envelope) }
       let(:envelope) do
         described_class::EventEnvelope.new(
@@ -44,6 +44,24 @@ RSpec.describe StagedEvent do
 
       it { is_expected.to be_instance_of(described_class::Model) }
       it { is_expected.to have_attributes(id: expected_uuid, data: expected_data, topic: options[:topic]) }
+    end
+
+    describe ".save_proto!" do
+      subject(:call) { described_class.save_proto!(example_proto, **options) }
+
+      let(:model) { instance_double(described_class::Model, save!: true) }
+
+      before { allow(described_class).to receive(:from_proto).and_return(model) }
+
+      it "forwards the params" do
+        call
+        expect(described_class).to have_received(:from_proto).with(example_proto, **options)
+      end
+
+      it "saves the model" do
+        call
+        expect(model).to have_received(:save!)
+      end
     end
 
     describe ".deserialize_event" do

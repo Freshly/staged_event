@@ -36,6 +36,24 @@ rails db:migrate
 
 ### Publishing Events
 
+A typical usage of StagedEvent would look something like this:
+
+```ruby
+ActiveRecord::Base.transaction do
+  user = User.create!(params)
+
+  StagedEvent.save_proto!(MyEvents::UserCreatedEvent.new(name: user.name, email: user.email))
+end
+```
+This guarantees that a) creating a new User, and b) publishing the associated event, both happen atomically even though b) will result in sending data to an external system.
+
+An alternate syntax if you need access to the ActiveRecord model for the event is:
+```ruby
+  event = StagedEvent.from_proto(MyEvents::UserCreatedEvent.new(name: user.name, email: user.email))
+  event.is_a?(ActiveRecord::Base) # true
+  event.save!
+```
+
 In order for events to actually be published, StagedEvent provides a rake task that should be kept running alongside your application server(s):
 
 ```bash
@@ -44,13 +62,13 @@ rake staged_event:publisher
 
 ### Receiving Events
 
-In order to receive events from publishers, StagedEvent provides a rake task that should be kept running alongside your application server(s):
+To receive events from publishers, StagedEvent provides a rake task that should be kept running alongside your application server(s):
 
 ```bash
 rake staged_event:subscriber
 ```
 
-In order to process incoming events, you define a callback in the staged_event initializer file.
+To specify what is done with incoming events, you define a callback in the StagedEvent initializer file.
 
 ### Regenerating Ruby from protobufs
 
