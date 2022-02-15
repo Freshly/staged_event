@@ -49,6 +49,12 @@ module StagedEvent
       Model.new(id: uuid, data: data, topic: topic)
     end
 
+    # Shortcut method to construct and persist an event with a single call.
+    # Params are the same as from_proto.
+    def save_from_proto!(proto, **kwargs)
+      StagedEvent.from_proto(proto, **kwargs).save!
+    end
+
     # Converts serialized event data received from a publisher into an object with
     # the event (and its metadata) in accessible form
     #
