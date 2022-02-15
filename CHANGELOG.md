@@ -5,6 +5,7 @@
 ## v0.0.2
 *Release Date: 02/15/2022*
 - Added StagedEvent.save_proto! shortcut method with documentation
+- Rescue SignalException in publisher and subscriber processes
 
 ## v0.0.1
 *Release Date: 10/12/2021*

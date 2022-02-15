@@ -18,6 +18,8 @@ module StagedEvent
       error :publish_failed, exception: exception.message
       backoff_timer.increment
       retry
+    rescue SignalException => exception
+      error :signal_exception, message: exception.message
     end
 
     private
