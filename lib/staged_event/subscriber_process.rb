@@ -13,6 +13,8 @@ module StagedEvent
     rescue StandardError => exception
       error :subscriber_main_loop_failed, exception: exception.message
       retry
+    rescue SignalException => exception
+      error :signal_exception, message: exception.message
     end
 
     private
