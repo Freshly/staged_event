@@ -15,6 +15,8 @@ StagedEvent::Configuration.configure do |config|
       default: "topic_id_1",
     }
 
+    # The list of subscription ids to which the staged_event subscriber process will
+    # subscribe.
     google_pubsub.subscription_ids = [ "subscription_id_1" ]
   end
 
