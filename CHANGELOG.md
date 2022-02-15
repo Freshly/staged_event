@@ -1,6 +1,9 @@
 # Changelog
 
 ## Upcoming <!-- Add unreleased change notes here: -->
+
+## v0.0.2
+*Release Date: 02/15/2022*
 - Added StagedEvent.save_proto! shortcut method with documentation
 
 ## v0.0.1
