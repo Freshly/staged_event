@@ -51,7 +51,7 @@ module StagedEvent
 
     # Shortcut method to construct and persist an event with a single call.
     # Params are the same as from_proto.
-    def save_from_proto!(proto, **kwargs)
+    def save_proto!(proto, **kwargs)
       StagedEvent.from_proto(proto, **kwargs).save!
     end
 

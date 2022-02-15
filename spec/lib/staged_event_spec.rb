@@ -46,8 +46,8 @@ RSpec.describe StagedEvent do
       it { is_expected.to have_attributes(id: expected_uuid, data: expected_data, topic: options[:topic]) }
     end
 
-    describe ".save_from_proto!" do
-      subject(:call) { described_class.save_from_proto!(example_proto, **options) }
+    describe ".save_proto!" do
+      subject(:call) { described_class.save_proto!(example_proto, **options) }
 
       let(:model) { instance_double(described_class::Model, save!: true) }
 
